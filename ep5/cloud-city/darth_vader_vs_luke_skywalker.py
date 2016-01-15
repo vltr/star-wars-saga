@@ -3,10 +3,42 @@
 from __future__ import unicode_literals
 
 import sys
+import logging
+import language_typology as lang_typ
 import star_wars as sw
 
 
+class LogFactory(object):
+    """
+    Helps to provide standart logging
+    """
+    logger = None
+
+    @classmethod
+    def get_logger(cls):
+        """
+        Returns the logger
+        """
+        if cls.logger is None:
+            cls.logger = logging.getLogger('star_wars')
+            cls.logger.setLevel(logging.DEBUG)
+
+            formatter = logging.Formatter('%(asctime)s - %(name)s - '
+                                          '%(levelname)s - %(message)s')
+
+            ch = logging.StreamHandler()
+            ch.setLevel(logging.DEBUG)
+            ch.setFormatter(formatter)
+
+            cls.logger.addHandler(ch)
+
+        return cls.logger
+
+
 class LaunchYourselfIntoTheVoid(Exception):
+    """
+    Raised during really desperate situations
+    """
     def __init__(self, can_still_be_rescued=False, dont_ask_how=False,
                  *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
@@ -16,10 +48,15 @@ class LaunchYourselfIntoTheVoid(Exception):
 
 
 def main():
+    log = LogFactory.get_logger()
+    log.warn('Spoiler Alert!')
+
     lando_calrissian = sw.Character(side=None, aka=['Lando',
                                                     'Lando Calrissian'])
     luke = sw.Character(side=sw.LIGHT, aka=['Luke', 'Skywalker'])
     vader = sw.Character(side=sw.DARK, aka=['Darth Vader'])
+
+    sw.const.YODA.language_typology = lang_typ.OSV + lang_typ.OAV
 
     vader.threatens(
         who=lando_calrissian,
@@ -51,13 +88,13 @@ def main():
                     if lyitv.dont_ask_how:
                         sw.plot.next_movie(ep=6)
 
-        sys.stderr.write(sw._('IN_THIS_EPISODE_SUCH_THING_HAPPENS_NOT',
-                              language=sw.const.YODA))
+        log.error(sw._('IN_THIS_EPISODE_SUCH_THING_HAPPENS_NOT',
+                       linguistic_typology=sw.const.YODA))
         sys.exit(1)
     except sw.SameSideException:
-        sys.stderr.write('there should be at least one character at each '
-                         'side of the force for a proper lightsaber fight')
+        log.critical('there should be at least one character at each '
+                     'side of the force for a proper lightsaber fight')
+        raise
 
 if __name__ == '__main__':
     main()
-

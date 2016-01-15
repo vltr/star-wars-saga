@@ -10,7 +10,7 @@ import star_wars as sw
 
 class LogFactory(object):
     """
-    Helps to provide standart logging
+    Helper class to provide standard logging
     """
     logger = None
 
@@ -66,12 +66,11 @@ def main():
 
     try:
         fight = sw.LightSaberFight(luke, vader)
+        fight.add_defense_techniques(all=True)
 
         while fight.is_not_over() or luke.body.has_both_arms():
             fight.strike(vader, on=luke)
-            fight.set_defense(luke)
             fight.strike(luke, on=vader)
-            fight.set_defense(vader)
         try:
             vader.talk(sw._('LUKE_I_AM_YOUR_FATHER'))
             luke.talk(sw._('NOOOOOOOOOOOOOOOOOOOOOOOO'))
